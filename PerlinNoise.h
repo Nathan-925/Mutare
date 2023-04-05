@@ -8,8 +8,6 @@
 #ifndef PERLINNOISE_H_
 #define PERLINNOISE_H_
 
-#include <ctime>
-
 namespace top{
 
 	class PerlinNoise{
