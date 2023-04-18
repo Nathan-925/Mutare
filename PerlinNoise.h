@@ -8,17 +8,20 @@
 #ifndef PERLINNOISE_H_
 #define PERLINNOISE_H_
 
-namespace top{
+#include "Noise.h"
 
-	class PerlinNoise{
+namespace mut{
+
+	template<int dimensions>
+	class PerlinNoise: public Noise<dimensions>{
 	public:
-		int width, height;
-		double** values;
+		int size[dimensions];
+		double** vectors;
 
-		PerlinNoise(int width, int height, int tileWidth, unsigned int seed = 1u);
+		PerlinNoise(int size..., unsigned int seed = 1u);
 		~PerlinNoise();
 
-		const double* operator[](int n);
+		double get(double position...);
 	};
 
 }
