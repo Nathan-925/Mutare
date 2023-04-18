@@ -16,14 +16,14 @@ using namespace priori;
 using namespace top;
 
 int main(){
-	PerlinNoise noise(100, 100, 10);
-	Image img(noise.width, noise.height);
+	int w = 1000, h = 1000, t = 100;
+	srand(time(nullptr));
+	PerlinNoise p(w, h, t, rand());
+	Image img(w, h);
 
-	for(int i = 0; i < noise.width; i++)
-		for(int j = 0; j < noise.height; j++){
-			int c = 255*pow(noise[i][j]*0.5+0.5, 2.0);
-			img[i][j] = Color(c, c, c);
-		}
+	for(int i = 0; i < w; i++)
+		for(int j = 0; j < h; j++)
+			img[i][j] = Color(0xFFFFFF)*(p[i][j]*0.5+0.5);
 
 	writebmp("test.bmp", img);
 }
