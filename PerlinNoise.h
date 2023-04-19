@@ -18,7 +18,7 @@ namespace mut{
 		int size[dimensions];
 		double** vectors;
 
-		PerlinNoise(unsigned int seed , int size...);
+		PerlinNoise(unsigned int seed, int size...);
 		PerlinNoise(int size...);
 		~PerlinNoise();
 
