@@ -14,7 +14,7 @@ using namespace std;
 namespace mut{
 
 	template<int dimensions>
-	PerlinNoise<dimensions>::PerlinNoise(int size..., unsigned int seed) : size(size){
+	PerlinNoise<dimensions>::PerlinNoise(unsigned int seed, int size...) : size(size){
 		int length = 1;
 		for(int n: size)
 			length *= n;
@@ -22,17 +22,20 @@ namespace mut{
 
 		default_random_engine rand(seed);
 		normal_distribution<double> distribution;
-		for(double* &v: vectors){
-			v = new double[dimensions];
+		for(int i = 0; i < dimensions; i++){
+			vectors[i] = new double[size[i]];
 			double mag = 0;
 			for(int i = 0; i < dimensions; i++){
-				v[i] = distribution(rand);
-				mag += v[i];
+				vectors[i][i] = distribution(rand);
+				mag += vectors[i][i];
 			}
-			for(double &d: v)
+			for(double &d: vectors[i])
 				d /= mag;
 		}
 	}
+
+	template<int dimensions>
+	PerlinNoise<dimensions>::PerlinNoise(int size...) : PerlinNoise(1u, size){}
 
 	template<int dimensions>
 	PerlinNoise<dimensions>::~PerlinNoise(){
