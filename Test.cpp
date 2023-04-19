@@ -18,7 +18,7 @@ using namespace mut;
 int main(){
 	int w = 1000, h = 1000, t = 100;
 	srand(time(nullptr));
-	PerlinNoise<2> p(t, t, rand());
+	PerlinNoise<2> p(rand(), t, t);
 	Image img(w, h);
 
 	for(int i = 0; i < w; i++)

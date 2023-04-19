@@ -6,6 +6,8 @@
  */
 #include <random>
 #include <queue>
+#include <cstdarg>
+#include <iostream>
 
 #include "PerlinNoise.h"
 
@@ -14,16 +16,20 @@ using namespace std;
 namespace mut{
 
 	template<int dimensions>
-	PerlinNoise<dimensions>::PerlinNoise(unsigned int seed, int size...) : size(size){
+	PerlinNoise<dimensions>::PerlinNoise(unsigned int seed, int size...){
 		int length = 1;
-		for(int n: size)
+		for(int n: size){
+			cout << n << endl;
 			length *= n;
+		}
 		vectors = new double*[length];
 
 		default_random_engine rand(seed);
 		normal_distribution<double> distribution;
+		va_list list;
+		va_start(list, size);
 		for(int i = 0; i < dimensions; i++){
-			vectors[i] = new double[size[i]];
+			vectors[i] = new double[va_arg(list, int)];
 			double mag = 0;
 			for(int i = 0; i < dimensions; i++){
 				vectors[i][i] = distribution(rand);
@@ -32,6 +38,7 @@ namespace mut{
 			for(double &d: vectors[i])
 				d /= mag;
 		}
+		va_end(list);
 	}
 
 	template<int dimensions>
@@ -44,15 +51,19 @@ namespace mut{
 
 	template<int dimensions>
 	double PerlinNoise<dimensions>::get(double position...){
+		double index[dimensions];
 		double offset[dimensions];
+		va_list list;
+		va_start(list, position);
 		for(int i = 0; i < dimensions; i++)
-			offset[i] = modf(position[i]*size[i], &position[i]);
+			offset[i] = modf(va_arg(list, double)*size[i], &index[i]);
+		va_end(list);
 
 		queue<double> queue;
 		for(int i = 0; i < pow(2, dimensions); i++){
 			int pos;
 			for(int j = 0; j < dimensions; j++)
-				pos *= (i>>j)&1 ? 1+position[j] : position[j];
+				pos *= (i>>j)&1 ? 1+index[j] : index[j];
 
 			double dot = 0;
 			for(int j = 0; j < dimensions; j++)
