@@ -23,7 +23,7 @@ int main(){
 
 	for(int i = 0; i < w; i++)
 		for(int j = 0; j < h; j++)
-			img[i][j] = Color(0xFFFFFF)*(p.get((double)i*w, (double)j*h)*0.5+0.5);
+			img[i][j] = Color(0xFFFFFF)*(p.get((double)i/w, (double)j/h)*0.5+0.5);
 
 	writebmp("test.bmp", img);
 }
