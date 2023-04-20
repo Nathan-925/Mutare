@@ -34,12 +34,12 @@ namespace mut{
 			va_start(list, size);
 			int length = size;
 			for(int i = 1; i < dimensions; i++){
-				int n = va_arg(list, int);
-				length *= n;
-				std::cout << n << " " << length << std::endl;
+				this->size[i] = va_arg(list, int);
+				length *= this->size[i];
 			}
 			va_end(list);
 			vectors = new double*[length];
+			std::cout << length << " " << dimensions << std::endl;
 
 			std::default_random_engine rand(seed);
 			std::normal_distribution<double> distribution;
@@ -48,9 +48,10 @@ namespace mut{
 				double mag = 0;
 				for(int j = 0; j < dimensions; j++){
 					vectors[i][j] = distribution(rand);
-					mag += vectors[i][j];
+					mag += vectors[i][j]*vectors[i][j];
 				}
 
+				mag = std::sqrt(mag);
 				for(int j = 0; j < dimensions; j++)
 					vectors[i][j] /= mag;
 			}
@@ -73,6 +74,9 @@ namespace mut{
 			for(int i = 1; i < dimensions; i++)
 				offset[i] = modf(va_arg(list, double)*size[i], &index[i]);
 			va_end(list);
+			for(int i = 0; i < dimensions; i++)
+				std::cout << index[i] << " ";
+			std::cout << std::endl;
 
 			std::queue<double> queue;
 			for(int i = 0; i < pow(2, dimensions); i++){

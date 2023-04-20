@@ -16,7 +16,7 @@ using namespace priori;
 using namespace mut;
 
 int main(){
-	int w = 1000, h = 1000, t = 100;
+	int w = 100, h = 100, t = 10;
 	srand(time(nullptr));
 	PerlinNoise<2> p(rand(), t, t);
 	Image img(w, h);
