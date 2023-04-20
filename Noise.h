@@ -12,11 +12,15 @@ namespace mut{
 
 	template<int dimensions>
 	class Noise{
+	public:
+		const unsigned int seed;
 
-		Noise(unsigned int seed = 1u);
-		virtual ~Noise();
+		Noise(unsigned int seed = 1u) : seed(seed){}
+		virtual ~Noise(){}
 
-		virtual double get(double position...);
+		virtual double get(double position...){
+			return 0;
+		}
 
 	};
 
