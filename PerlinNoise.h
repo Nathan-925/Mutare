@@ -21,18 +21,22 @@ namespace mut{
 	template<int dimensions>
 	class PerlinNoise: public Noise<dimensions>{
 	public:
-		int offsets[dimensions];
+		int size[dimensions];
 		double** vectors;
 
 		PerlinNoise(unsigned int seed, int size...) : Noise<dimensions>(seed){
 			va_list list;
 			va_start(list, size);
-			offsets[0] = 1;
-			for(int i = 1; i < dimensions; i++)
-				offsets[i] = va_arg(list, int)*offsets[i-1];
+			this->size[0] = size;
+			int length = size;
+			for(int i = 1; i < dimensions; i++){
+				this->size[i] = va_arg(list, int);
+				std::cout << this->size[i] << std::endl;
+				length *= this->size[i];
+			}
 			va_end(list);
-			vectors = new double*[offset];
-			std::cout << offset << " " << dimensions << std::endl;
+			vectors = new double*[length];
+			std::cout << length << " " << dimensions << std::endl;
 
 			std::default_random_engine rand(seed);
 			std::normal_distribution<double> distribution;
@@ -74,13 +78,18 @@ namespace mut{
 
 			std::queue<double> queue;
 			for(int i = 0; i < pow(2, dimensions); i++){
-				int pos = 1;
-				for(int j = 0; j < dimensions; j++)
-					pos *= (i>>j)&1 ? 1+index[j] : index[j];
+				int pos = 0;
+				for(int j = 0, offset = 1; j < dimensions; offset *= size[j], j++){
+					std::cout << ((i>>j)&1 ? 1+index[j] : index[j]) << " ";
+					pos += offset*((i>>j)&1 ? 1+index[j] : index[j]);
+				}
+				std::cout << std::endl << std::endl;
 
 				double dot = 0;
-				for(int j = 0; j < dimensions; j++)
+				for(int j = 0; j < dimensions; j++){
+					std::cout << pos << std::endl;
 					dot += vectors[pos][j]+((i>>j)&1 ? 1-fraction[j] : fraction[j]);
+				}
 				queue.push(dot);
 			}
 
