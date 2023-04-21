@@ -20,26 +20,19 @@ namespace mut{
 
 	template<int dimensions>
 	class PerlinNoise: public Noise<dimensions>{
-
-		struct Vector{
-
-		};
-
 	public:
-		int size[dimensions];
+		int offsets[dimensions];
 		double** vectors;
 
 		PerlinNoise(unsigned int seed, int size...) : Noise<dimensions>(seed){
 			va_list list;
 			va_start(list, size);
-			int length = size;
-			for(int i = 1; i < dimensions; i++){
-				this->size[i] = va_arg(list, int);
-				length *= this->size[i];
-			}
+			offsets[0] = 1;
+			for(int i = 1; i < dimensions; i++)
+				offsets[i] = va_arg(list, int)*offsets[i-1];
 			va_end(list);
-			vectors = new double*[length];
-			std::cout << length << " " << dimensions << std::endl;
+			vectors = new double*[offset];
+			std::cout << offset << " " << dimensions << std::endl;
 
 			std::default_random_engine rand(seed);
 			std::normal_distribution<double> distribution;
@@ -56,6 +49,7 @@ namespace mut{
 					vectors[i][j] /= mag;
 			}
 		}
+
 		~PerlinNoise(){
 			int length = 1;
 			for(int n: size)
@@ -67,12 +61,12 @@ namespace mut{
 
 		double get(double position...){
 			double index[dimensions];
-			double offset[dimensions];
+			double fraction[dimensions];
 			va_list list;
 			va_start(list, position);
-			offset[0] = modf(position*size[0], &index[0]);
+			fraction[0] = modf(position*size[0], &index[0]);
 			for(int i = 1; i < dimensions; i++)
-				offset[i] = modf(va_arg(list, double)*size[i], &index[i]);
+				fraction[i] = modf(va_arg(list, double)*size[i], &index[i]);
 			va_end(list);
 			for(int i = 0; i < dimensions; i++)
 				std::cout << index[i] << " ";
@@ -86,14 +80,14 @@ namespace mut{
 
 				double dot = 0;
 				for(int j = 0; j < dimensions; j++)
-					dot += vectors[pos][j]+((i>>j)&1 ? 1-offset[j] : offset[j]);
+					dot += vectors[pos][j]+((i>>j)&1 ? 1-fraction[j] : fraction[j]);
 				queue.push(dot);
 			}
 
 			while(queue.size() > 1){
 				double d = queue.front();
 				queue.pop();
-				queue.push(d + smoothstep(offset[(int)ceil(log2(queue.size()))])*(queue.front()-d));
+				queue.push(d + smoothstep(fraction[(int)ceil(log2(queue.size()))])*(queue.front()-d));
 				queue.pop();
 			}
 
