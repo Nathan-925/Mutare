@@ -16,14 +16,18 @@ using namespace priori;
 using namespace mut;
 
 int main(){
-	int w = 100, h = 100, t = 10;
+	int w = 100, h = 100, d = 10, t = 5;
 	srand(time(nullptr));
-	PerlinNoise<2> p(rand(), t, t);
+	PerlinNoise<3> p(rand(), t, t, t);
 	Image img(w, h);
 
 	for(int i = 0; i < w; i++)
 		for(int j = 0; j < h; j++)
-			img[i][j] = Color(0xFFFFFF)*(p.get((double)i/w, (double)j/h)*0.5+0.5);
+		for(int l = 0; l < d; l++){
+			int c = 255*(p.get((double)i/w, (double)j/h, (double)l/d)*0.5+0.5);
+			img[i][j] = Color(c, c, c);
+		}
 
-	writebmp("test.bmp", img);
+	for(int i = 0; i < d; i++)
+		writebmp("test"+to_string(i)+".bmp", img);
 }

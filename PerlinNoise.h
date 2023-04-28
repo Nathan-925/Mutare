@@ -11,7 +11,6 @@
 #include <cstdarg>
 #include <random>
 #include <queue>
-#include <iostream>
 
 #include "Noise.h"
 #include "Functions.h"
@@ -31,12 +30,10 @@ namespace mut{
 			int length = this->size[0];
 			for(int i = 1; i < dimensions; i++){
 				this->size[i] = va_arg(list, int);
-				std::cout << this->size[i] << std::endl;
 				length *= this->size[i];
 			}
 			va_end(list);
 
-			std::cout << length << " " << dimensions << std::endl;
 			vectors = new double*[length];
 
 			std::default_random_engine rand(seed);
@@ -68,44 +65,38 @@ namespace mut{
 			double index[dimensions];
 			va_list list;
 			va_start(list, position);
-			index[0] = position;
-			std::cout << "d " << position << std::endl;
-			for(int i = 1; i < dimensions; i++){
-				double d = va_arg(list, double);
-				std::cout << "d " << d << std::endl;
-				index[i] = d;
-			}
+			index[0] = position*(size[0]-1);
+			for(int i = 1; i < dimensions; i++)
+				index[i] = va_arg(list, double)*(size[i]-1);
 			va_end(list);
-			for(int i = 0; i < dimensions; i++)
-				std::cout << index[i] << "/" << index[i]/size[i] << " ";
-			std::cout << std::endl;
 
 			std::queue<double> queue;
 			for(int i = 0; i < pow(2, dimensions); i++){
 				int pos = 0;
-				std::cout  << std::endl << "p ";
-				for(int j = 0, offset = 1; j < dimensions; offset *= size[j], j++){
-					std::cout << ((i>>j)&1 ? std::ceil(index[j]) : std::floor(index[j])) << "/" << offset << " ";
+				int offset = 1;
+				for(int j = 0; j < dimensions; offset *= size[j], j++)
 					pos += offset*((i>>j)&1 ? std::ceil(index[j]) : std::floor(index[j]));
-					std::cout << pos << " ";
-				}
-				std::cout << std::endl;
+
+				double fraction[dimensions];
+				double temp;
+				for(int j = 0; j < dimensions; j++)
+					fraction[j] = (i>>j)&1 ? std::modf(index[j], &temp)-1 : std::modf(index[j], &temp);
 
 				double dot = 0;
-				double temp;
-				for(int j = 0; j < dimensions; j++){
-					std::cout << pos << " " << j << std::endl;
-					dot += vectors[pos][j]+std::modf((i>>j)&1 ? 1-index[j] : index[j], &temp);
-				}
+				for(int j = 0; j < dimensions; j++)
+					dot += vectors[pos][j]*fraction[j];
 				queue.push(dot);
 			}
 
 			double temp;
 			while(queue.size() > 1){
-				double d = queue.front();
+				int dimension = dimensions-(int)ceil(log2(queue.size()));
+				double d1 = queue.front();
 				queue.pop();
-				queue.push(d + smoothstep(std::modf(index[(int)ceil(log2(queue.size()))], &temp))*(queue.front()-d));
+				double d2 = queue.front();
 				queue.pop();
+
+				queue.push(d1 + smoothstep(std::modf(index[dimension], &temp))*(d2-d1));
 			}
 
 			return queue.front();
